@@ -5,10 +5,10 @@ branches = {}
 IO.popen('git branch -a', 'r').each.grep(%r{^\s+remotes/origin/\d+}) do |branch|
     branch.sub!(%r{\s+remotes/}, '')
     branch.chomp!
-    author, commit_date = `git log -1 --format='%ae%n%ar' #{branch}`.split(/\n/)
+    committer, commit_date = `git log -1 --format='%ce%n%cr' #{branch}`.split(/\n/)
     commit_date.chomp!
-    branches[author] ||= []
-    branches[author] << "#{branch} (last commit #{commit_date})"
+    branches[committer] ||= []
+    branches[committer] << "#{branch} (last commit #{commit_date})"
 end
 
 branches.each_pair do |k,v|
