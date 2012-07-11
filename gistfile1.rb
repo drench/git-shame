@@ -2,7 +2,7 @@
 
 branches = {}
 
-IO.popen('git branch -a', 'r').each.grep(%r{^\s+remotes/origin/\d+}) do |branch|
+IO.popen('git branch -a', 'r').each.grep(%r{^\s+remotes/origin/\S+$}) do |branch|
     branch.sub!(%r{\s+remotes/}, '')
     branch.chomp!
     committer, rel_commit_date, timestamp = `git log -1 --format='%ce%n%cr%n%ct' #{branch}`.chomp.split(/\n/)
