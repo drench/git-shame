@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'colored'
+
 branches = {}
 
 def is_merged? (upstream, head)
@@ -13,9 +15,9 @@ IO.popen('git branch -a', 'r').grep(%r{^\s+remotes/origin/\S+$}).map { |b| b.sub
 end
 
 branches.each_pair do |k,v|
-    print "#{k}:\n"
+    print "#{k}:\n".yellow
     v.sort { |a,b| a[2] <=> b[2] }.map { |b|
-        b[0] + ' (last commit ' + b[1] + ', ' + (is_merged?('origin/develop', b[0]) ? 'merged' : 'NOT MERGED') + ')'
+        b[0].green + ' (last commit ' + b[1] + ', ' + (is_merged?('origin/develop', b[0]) ? 'merged'.magenta : 'NOT MERGED'.red) + ')'
     }.each do |branch|
         print "\t#{branch}\n"
     end
