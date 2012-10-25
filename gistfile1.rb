@@ -3,9 +3,14 @@
 require 'colored'
 
 branches = {}
+$merged_branches = {}
 
-def is_merged? (upstream, head)
-    IO.popen("git cherry #{upstream} #{head}", 'r').lines.count == 0
+IO.popen('git branch -r --no-color --merged', 'r').grep(%r{^\s+origin/\S+$}).map { |b| b.sub(%r{\s+}, '').chomp }.each do |branch|
+    $merged_branches[branch] = true
+end
+
+def is_merged? (branch)
+    $merged_branches.has_key?(branch) && $merged_branches[branch];
 end
 
 IO.popen('git branch -a', 'r').grep(%r{^\s+remotes/origin/\S+$}).map { |b| b.sub(%r{^\s+remotes/}, '').chomp }.each do |branch|
@@ -17,7 +22,7 @@ end
 branches.each_pair do |k,v|
     print "#{k}:\n".yellow
     v.sort { |a,b| a[2] <=> b[2] }.map { |b|
-        b[0].green + ' (last commit ' + b[1] + ', ' + (is_merged?('origin/develop', b[0]) ? 'merged'.magenta : 'NOT MERGED'.red) + ')'
+        b[0].green + ' (last commit ' + b[1] + ', ' + (is_merged?(b[0]) ? 'merged'.magenta : 'NOT MERGED'.red) + ')'
     }.each do |branch|
         print "\t#{branch}\n"
     end
