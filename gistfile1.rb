@@ -1,6 +1,19 @@
 #!/usr/bin/env ruby
 
-require 'colored'
+use_color = STDOUT.tty?
+begin
+    require 'colored' if use_color
+rescue LoadError
+    use_color = false
+end
+
+unless use_color
+    class String
+        %w(blue green magenta red yellow).each do |color|
+            define_method(color.to_sym) { self }
+        end
+    end
+end
 
 branches = {}
 $merged_branches = {}
