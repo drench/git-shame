@@ -32,7 +32,9 @@ IO.popen('git branch -r --no-color', 'r').grep(%r{^\s+origin/\S+$}).map { |b| b.
     branches[committer] << [ branch, rel_commit_date, timestamp ]
 end
 
-branches.each_pair do |k,v|
+branches.keys.sort { |a,b| branches[b].length <=> branches[a].length }.map { |k| [k, branches[k]] }.each do |b|
+    k = b[0]
+    v = b[1]
     print "#{k}:\n".yellow
     v.sort { |a,b| a[2] <=> b[2] }.map { |b|
         b[0].green + ' (last commit ' + b[1] + ', ' + (is_merged?(b[0]) ? 'merged'.magenta : 'NOT MERGED'.red) + ')'
