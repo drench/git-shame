@@ -9,6 +9,7 @@ options = {
     :show_merged   => true,
     :show_report   => true,
     :show_unmerged => true,
+    :users         => nil,
 }
 
 OptionParser.new do |opts|
@@ -30,6 +31,9 @@ OptionParser.new do |opts|
     end
     opts.on('--[no-]show-unmerged') do |o|
         options[:show_unmerged] = o
+    end
+    opts.on('--users x,y,z', Array) do |o|
+        options[:users] = o
     end
 end.parse!
 
@@ -62,6 +66,7 @@ end
 
 IO.popen('git branch -r --no-color', 'r').grep(remote_match).map { |b| b.chomp.sub(/^\s+/, '') }.each do |branch|
     committer, rel_commit_date, timestamp = `git log -1 --format='%ce%n%cr%n%ct' #{branch}`.chomp.split(/\n/)
+    next if options[:users] && ! options[:users].include?(committer)
     is_merged = is_merged?(branch)
     if (is_merged && options[:show_merged]) || (! is_merged && options[:show_unmerged])
         branches[committer] ||= []
