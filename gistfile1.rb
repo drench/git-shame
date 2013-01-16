@@ -1,13 +1,39 @@
 #!/usr/bin/env ruby
 
-use_color = STDOUT.tty?
+require 'optparse'
+
+options = {
+    :color         => STDOUT.tty?,
+    :remote        => 'origin',
+    :show_merged   => true,
+    :show_unmerged => true,
+}
+
+OptionParser.new do |opts|
+    opts.banner = "Usage: #{$0} --[no-]color --remote [REMOTE] --[no-]show-merged --[no-]show-unmerged"
+    opts.on('--[no-]color') do |o|
+        options[:color] = o
+    end
+    opts.on('--remote [REMOTE]') do |o|
+        options[:remote] = o
+    end
+    opts.on('--[no-]show-merged') do |o|
+        options[:show_merged] = o
+    end
+    opts.on('--[no-]show-unmerged') do |o|
+        options[:show_unmerged] = o
+    end
+end.parse!
+
+remote_match = %r{^\s+#{Regexp::quote(options[:remote])}/\S+$}
+
 begin
-    require 'colored' if use_color
+    require 'colored' if options[:color]
 rescue LoadError
-    use_color = false
+    options[:color] = false
 end
 
-unless use_color
+unless options[:color]
     class String
         %w(blue green magenta red yellow).each do |color|
             define_method(color.to_sym) { self }
@@ -18,7 +44,7 @@ end
 branches = {}
 $merged_branches = {}
 
-IO.popen('git branch -r --no-color --merged', 'r').grep(%r{^\s+origin/\S+$}).map { |b| b.sub(%r{\s+}, '').chomp }.each do |branch|
+IO.popen('git branch -r --no-color --merged', 'r').grep(remote_match).map { |b| b.sub(%r{\s+}, '').chomp }.each do |branch|
     $merged_branches[branch] = true
 end
 
@@ -26,17 +52,20 @@ def is_merged? (branch)
     $merged_branches.has_key?(branch) && $merged_branches[branch];
 end
 
-IO.popen('git branch -r --no-color', 'r').grep(%r{^\s+origin/\S+$}).map { |b| b.chomp.sub(/^\s+/, '') }.each do |branch|
+IO.popen('git branch -r --no-color', 'r').grep(remote_match).map { |b| b.chomp.sub(/^\s+/, '') }.each do |branch|
     committer, rel_commit_date, timestamp = `git log -1 --format='%ce%n%cr%n%ct' #{branch}`.chomp.split(/\n/)
-    branches[committer] ||= []
-    branches[committer] << [ branch, rel_commit_date, timestamp ]
+    is_merged = is_merged?(branch)
+    if (is_merged && options[:show_merged]) || (! is_merged && options[:show_unmerged])
+        branches[committer] ||= []
+        branches[committer] << [ branch, rel_commit_date, timestamp, is_merged?(branch) ]
+    end
 end
 
 branches.keys.sort { |a,b| branches[b].length <=> branches[a].length }.each do |k|
     v = branches[k]
     print "#{k}:\n".yellow
     v.sort { |a,b| a[2] <=> b[2] }.map { |b|
-        b[0].green + ' (last commit ' + b[1] + ', ' + (is_merged?(b[0]) ? 'merged'.magenta : 'NOT MERGED'.red) + ')'
+        b[0].green + ' (last commit ' + b[1] + ', ' + (b[3] ? 'merged'.magenta : 'NOT MERGED'.red) + ')'
     }.each do |branch|
         print "\t#{branch}\n"
     end
