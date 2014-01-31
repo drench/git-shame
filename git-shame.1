@@ -1,0 +1,115 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "GIT\-SHAME" "1" "January 2014" "" ""
+.
+.SH "NAME"
+\fBgit\-shame\fR \- Who to blame for stale remote branches
+.
+.SH "SYNOPSYS"
+\fBgit shame\fR [\-\-[no]\-color] [\-\-remote REMOTE] [\-\-[no\-]show\-commands] [\-\-[no\-]show\-report] [\-\-[no\-]show\-merged] [\-\-[no\-]show\-unmerged] [\-\-users email1@example\.com, email2@example\.com, \.\.\.]
+.
+.SH "DESCRIPTION"
+Projects can accumulate a significant number of remote topic branches\. Which are active? Which are safe to delete? Who "owns" them?
+.
+.P
+\fBgit shame\fR knows, and can help you clean these branches up (see \fIEXAMPLES\fR)\.
+.
+.SH "OPTIONS"
+.
+.IP "\(bu" 4
+\fB\-\-color\fR
+.
+.IP
+Colorful output\. This is automatically set when output is a TTY and the \fIcolored\fR gem is installed\.
+.
+.IP "\(bu" 4
+\fB\-\-no\-color\fR
+.
+.IP
+Turn off colors\. This is the default when output is not to a TTY\.
+.
+.IP "\(bu" 4
+\fB\-\-remote REMOTE\fR
+.
+.IP
+Specify a remote branch\. The default is \fIorigin\fR\.
+.
+.IP "\(bu" 4
+\fB\-\-show\-commands\fR
+.
+.IP
+Output shell commands to delete remote branches\. This is off by default\.
+.
+.IP "\(bu" 4
+\fB\-\-no\-show\-commands\fR
+.
+.IP
+Do not output shell commands\. This is the default\.
+.
+.IP "\(bu" 4
+\fB\-\-show\-report\fR
+.
+.IP
+Output a report of remote branches, grouped by their "owners", ordered by staleness (time of most recent commit), showing their merged/unmerged status relative to the currently checked out branch\. This is on by default\.
+.
+.IP "\(bu" 4
+\fB\-\-no\-show\-report\fR
+.
+.IP
+Don\'t show a report\. You may want to use this in conjunction with \fB\-\-show\-commands\fR and pipe the output to sh(1) (be careful!)
+.
+.IP "\(bu" 4
+\fB\-\-show\-merged\fR
+.
+.IP
+Show merged branches in report and command output\. This is on by default\.
+.
+.IP "\(bu" 4
+\fB\-\-no\-show\-merged\fR
+.
+.IP
+Do not show merged branches in report and command output\.
+.
+.IP "\(bu" 4
+\fB\-\-show\-unmerged\fR
+.
+.IP
+Show unmerged branches in report and command output\. This is on by default\.
+.
+.IP "\(bu" 4
+\fB\-\-no\-show\-unmerged\fR
+.
+.IP
+Do not show unmerged branches in report and command output\.
+.
+.IP "\(bu" 4
+\fB\-\-users email1@example\.com, email2@example\.com, \.\.\.\fR
+.
+.IP
+By default, \fBgit shame\fR\'s output includes all branches regardless of ownership\. You may limit report and command output to branches "owned" by certain users, specified by a list of one or more email addresses separated by commas\.
+.
+.IP "" 0
+.
+.SH "EXAMPLES"
+Before running any of these, make sure your local repo is up to date relative to your remote\. Run \fBgit pull\fR and \fBgit remote \-\-prune\fR\. As the merged status is relative to the currently checked out branch, be sure to \fBgit checkout\fR the branch you typically merge into (often this is \fImaster\fR or \fIdevelop\fR depending on the project\'s workflow)\.
+.
+.IP "\(bu" 4
+\fBgit shame\fR
+.
+.IP
+Running with no options generates the standard report\. The report groups branches by "owner", which \fBgit shame\fR defines as the user who made the last commit to it\. It\'s prettier if you have the \fIcolored\fR gem installed\.
+.
+.IP "\(bu" 4
+\fBgit shame \-\-no\-show\-report \-\-show\-commands \-\-show\-merged \-\-no\-show\-unmerged\fR
+.
+.IP
+This will output shell commands to delete all remote branches considered safe to delete (that is, they have been merged into the current branch)\. Resist the urge to pipe the output sh(1)! Sanity check it first\.
+.
+.IP "" 0
+.
+.SH "AUTHOR"
+Daniel Rench
+.
+.SH "SEE ALSO"
+git(1), git\-branch(1), git\-remote(1), git\-shame on github \fIhttps://github\.com/drench/git\-shame\fR
