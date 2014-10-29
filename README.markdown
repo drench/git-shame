@@ -81,13 +81,13 @@ is _master_ or _develop_ depending on the project's workflow).
   Running with no options generates the standard report.
   The report groups branches by "owner", which `git shame` defines as
   the user who made the last commit to it.
-  It's prettier if you have the _colored_ gem installed.
+  It's prettier if you have the `colored` gem installed.
 
 * `git shame --no-show-report --show-commands --show-merged --no-show-unmerged`
 
   This will output shell commands to delete all remote branches considered
   safe to delete (that is, they have been merged into the current branch).
-  Resist the urge to pipe the output sh(1)! Sanity check it first.
+  Resist the urge to pipe the output to sh(1)! Sanity check it first.
 
 ## AUTHOR
 
