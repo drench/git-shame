@@ -17,7 +17,9 @@ Which are active? Which are safe to delete? Who "owns" them?
 * `--color`
 
   Colorful output. This is automatically set when output is a TTY and
-  the _colored_ gem is installed.
+  the _colored_ gem is installed. If not specified and the Git config
+  value `color.shame` or `color.ui` is set, use that as a default
+  value.
 
 * `--no-color`
 
