@@ -2,8 +2,37 @@
 
 require "optparse"
 
+color_value = nil
+
+def get_setting(name)
+  IO.popen("git config --get " + name) { |pipe|
+    return pipe.read.strip
+  }
+end
+
+['color.shame', 'color.ui'].each { |name|
+  setting = get_setting name
+
+  puts name, setting
+  case setting
+  when 'always'
+    color_value = true
+  when 'false', 'never'
+    color_value = false
+  when 'auto', 'true'
+    color_value = STDOUT.tty?
+  when ''
+    next
+  else
+    puts 'Unknown color setting "' + setting + '" for "' + name + '"; falling back to "auto"'
+    color_value = STDOUT.tty?
+  end
+
+  break
+}
+
 options = {
-  color: STDOUT.tty?,
+  color: color_value,
   remote: "origin",
   show_commands: false,
   show_merged: true,
